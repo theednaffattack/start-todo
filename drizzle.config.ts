@@ -1,22 +1,17 @@
-import { log } from 'console'
-import { config as envConfig } from 'dotenv'
-import { defineConfig } from 'drizzle-kit'
-
-if (process.env.NODE_ENV && process.env.NODE_ENV == 'dev') {
-  envConfig({ path: '.env.local' })
-} else {
-  envConfig()
-}
-
-const db_url = `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:${process.env.DB_PORT}/${process.env.DB_DATABASE}`
-
-console.log('DB URL', db_url)
+import { defineConfig } from "drizzle-kit";
+import env from "./src/env";
 
 export default defineConfig({
-  out: './src/db/drizzle',
-  schema: './src/db/schema.ts',
-  dialect: 'postgresql',
+  out: "./src/db/drizzle",
+  schema: "./src/db/schema.ts",
+  dialect: "postgresql",
   dbCredentials: {
-    url: db_url,
+    // url: db_url,
+    database: env.DB_DATABASE,
+    host: env.DB_HOST,
+    password: env.DB_PASSWORD,
+    port: env.DB_PORT,
+    user: env.DB_USER,
+    ssl: env.ENV === "production" ? { rejectUnauthorized: false } : false,
   },
-})
+});

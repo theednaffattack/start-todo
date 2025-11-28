@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --host --port 3000",
+    "dev": "dotenv -e .env.local -- vite dev --host --port 8000",
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
@@ -11,15 +11,17 @@
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
     "db:clean": "rimraf ./src/db/db_data",
-    "db:local": "NODE_ENV=dev pnpm db:clean && docker-compose --env-file .env.local --project-directory ./ -f ./src/db/postgres-local.yml up -d",
-    "db:down": "NODE_ENV=dev docker compose --env-file .env.local -v -f ./src/db/postgres-local.yml down",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:pull": "drizzle-kit pull",
-    "db:studio": "NODE_ENV=dev drizzle-kit studio"
+    "db:local": "dotenv -e .env.local pnpm db:clean && docker-compose --env-file .env.local --project-directory ./ -f ./src/db/postgres-local.yml up -d",
+    "db:down": "dotenv -e .env.local docker compose --env-file .env.local -v -f ./src/db/postgres-local.yml down",
+    "db:generate": "dotenv -e .env.local drizzle-kit generate --config=drizzle.config.ts",
+    "db:migrate": "dotenv -e .env.local drizzle-kit migrate --config=drizzle.config.ts",
+    "db:push": "dotenv -e .env.local drizzle-kit push --config=drizzle.config.ts",
+    "db:pull": "dotenv -e .env.local drizzle-kit pull --config=drizzle.config.ts",
+    "db:studio": "dotenv -e .env.local drizzle-kit --config=drizzle.config.ts studio"
   },
   "dependencies": {
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
@@ -39,7 +41,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "tw-animate-css": "^1.3.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",
@@ -52,6 +55,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^16.0.0",
+    "dotenv-cli": "^11.0.0",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.1.2",
