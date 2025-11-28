@@ -11,3 +11,5 @@ count.txt
 .output
 .vinxi
 todos.json
+src/db/db_data
+src/db/drizzle

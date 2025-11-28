@@ -10,12 +10,14 @@
     "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
-    "db:local": "docker-compose --env-file .env.local --project-directory ./ -f ./src/db/postgres-local.yml up -d",
+    "db:clean": "rimraf ./src/db/db_data",
+    "db:local": "NODE_ENV=dev pnpm db:clean && docker-compose --env-file .env.local --project-directory ./ -f ./src/db/postgres-local.yml up -d",
+    "db:down": "NODE_ENV=dev docker compose --env-file .env.local -v -f ./src/db/postgres-local.yml down",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "NODE_ENV=dev drizzle-kit studio"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
@@ -52,6 +54,7 @@
     "dotenv": "^16.0.0",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
+    "rimraf": "^6.1.2",
     "tsx": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
