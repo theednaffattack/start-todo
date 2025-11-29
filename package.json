@@ -12,7 +12,7 @@
     "check": "prettier --write . && eslint --fix",
     "db:clean": "rimraf ./src/db/db_data",
     "db:local": "dotenv -e .env.local pnpm db:clean && docker-compose --env-file .env.local --project-directory ./ -f ./src/db/postgres-local.yml up -d",
-    "db:down": "dotenv -e .env.local docker compose --env-file .env.local -v -f ./src/db/postgres-local.yml down",
+    "db:down": "dotenv -e .env.local -- docker-compose --env-file .env.local -v -f ./src/db/postgres-local.yml down",
     "db:generate": "dotenv -e .env.local drizzle-kit generate --config=drizzle.config.ts",
     "db:migrate": "dotenv -e .env.local drizzle-kit migrate --config=drizzle.config.ts",
     "db:push": "dotenv -e .env.local drizzle-kit push --config=drizzle.config.ts",
