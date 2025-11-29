@@ -103,7 +103,7 @@ function TodosListTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead>chk</TableHead>
+            <TableHead></TableHead>
             <TableHead>Task</TableHead>
             <TableHead>Created On</TableHead>
             <TableHead className="w-0"></TableHead>
