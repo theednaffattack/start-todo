@@ -25,6 +25,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { EditIcon, ListTodoIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { startTransition, useState } from "react";
 import z from "zod";
 
 const serverLoader = createServerFn({ method: "GET" }).handler(() => {
@@ -55,7 +56,7 @@ function App() {
             </Badge>
           )}
         </div>
-        <div>
+        <div className="flex gap-2">
           <Button size="sm" asChild>
             <Link to="/todos/new">
               <PlusIcon /> Add Todo
@@ -126,6 +127,20 @@ const deleteTodo = createServerFn({ method: "POST" })
     return { error: false };
   });
 
+const toggleFn = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      id: z.string().min(1),
+      isComplete: z.boolean(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    await db
+      .update(todos)
+      .set({ isComplete: data.isComplete })
+      .where(eq(todos.id, data.id));
+  });
+
 function TodoTableRow({
   id,
   name,
@@ -138,24 +153,45 @@ function TodoTableRow({
   createdAt: Date;
 }) {
   const deleteFn = useServerFn(deleteTodo);
+  const toggleFnServer = useServerFn(toggleFn);
   const router = useRouter();
+  const [isCurrentComplete, setIsCurrentComplete] = useState(isComplete);
   return (
-    <TableRow>
+    <TableRow
+      onClick={async (evt) => {
+        evt.preventDefault();
+        const target = evt.target as HTMLElement;
+        if (target.closest("[data-actions]")) {
+          return;
+        }
+        startTransition(async () => {
+          setIsCurrentComplete((current) => !current);
+
+          await toggleFnServer({ data: { id: id, isComplete: !isComplete } });
+          router.invalidate();
+        });
+      }}
+    >
       <TableCell>
-        <Checkbox checked={isComplete} />
+        <Checkbox checked={isCurrentComplete} />
       </TableCell>
       <TableCell
         className={cn(
           "font-medium",
-          isComplete && "text-muted-foreground line-through",
+          isCurrentComplete && "text-muted-foreground line-through",
         )}
       >
         {name}
       </TableCell>
-      <TableCell className="text-sm text-muted-foreground line-through">
+      <TableCell
+        className={cn(
+          "font-medium",
+          isCurrentComplete && "text-muted-foreground line-through",
+        )}
+      >
         {formatDate(createdAt)}
       </TableCell>
-      <TableCell>
+      <TableCell data-actions>
         <div className="flex items-center justify-end gap-1">
           <Button variant="ghost" size="icon-sm" asChild>
             <Link to="/todos/$id/edit" params={{ id }}>
